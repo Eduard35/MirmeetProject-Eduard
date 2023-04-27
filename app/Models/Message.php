@@ -12,9 +12,9 @@ class Message extends Model
     protected $table = "messages";
     
     protected $fillable = [
+        'text',
         'sentby_id',
         'sento_id',
-        'text',
         'hidden',
     ];
 

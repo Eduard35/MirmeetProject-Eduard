@@ -1,10 +1,5 @@
 <template>
     <div class="chat flex" style="height: calc(100vh - 4rem);">
-        <div>
-            <button @click="startChat(1)">Start chat with 1</button>
-            <button @click="startChat(2)">Start chat with 2</button>
-        </div>
-
         <div class="flex flex-col justify-between">
             <div class="content flex flex-col gap-3" id="messages">
             </div>
@@ -47,6 +42,7 @@ export default {
         let id = (id) => document.getElementById(id)
 
         document.addEventListener('DOMContentLoaded', async (event) => {
+            this.startChat(window.location.pathname.split("/").pop())
             let messages = id('messages')
 
             let req = await axios.get('/me')
@@ -60,12 +56,13 @@ export default {
                 })
                 .listen('StartChat', (res) => {
                     console.log('Invitat a un nou xat', res)
-
+                    
                     window.Echo.join('chat-between.' + res.token)
                         .here((users) => {
                             console.log(`Acabo d'entrar a la sala ${res.token}`)
                             console.log(users)
                             this.actualToken = res.token
+                            this.getMessagesBetween()
                         })
                         .listen('NewMessage', (message) => {
                             console.log('Missatge rebut!', message)
@@ -79,24 +76,30 @@ export default {
     },
     methods: {
         showMessage(e) {
+            this.printMessage(e.username, e.message)
+            console.log(e);
+        },
+        printMessage(usernameFromServer, messageFromServer) {
             let messages = document.getElementById('messages')
             let div = document.createElement('div')
             div.classList.add('comment');
-            (e.username === this.username) 
+            (usernameFromServer === this.username) 
                 ? div.classList.add('my-comment')
                 : div.classList.add('other-comment')
             let p = document.createElement('p')
-            let message = document.createTextNode(e.username + ': ' + e.message)
+            let message = document.createTextNode(usernameFromServer+ ': ' + messageFromServer)
             p.appendChild(message)
             div.appendChild(p)
             messages.appendChild(div)
-            console.log(e);
         },
-        send() {
-            axios.post('/send', {
+        async send() {
+            let res = await axios.post('/send', {
                 message: document.getElementById('message').value,
                 token: this.actualToken
             })
+            if (res.status === 200) {
+                this.cleanInput()
+            }
         },
         async startChat(id) {
             let res = await axios.get('/start-chat/' + id)
@@ -106,11 +109,22 @@ export default {
             window.Echo.join('chat-between.' + token)
                 .here((users) => {
                     console.log(users)
+                    this.getMessagesBetween(id)
                 })
                 .listen('NewMessage', (message) => {
                     this.showMessage(message)
                 })
-        }       
+        },
+        async getMessagesBetween() {
+            let res = await axios.get('/messages-between/' + this.actualToken)
+            let messages = res.data
+            messages.forEach(m => {
+                this.printMessage(m.sender, m.text)
+            })
+        },
+        async cleanInput() {
+            document.getElementById('message').value = ''
+        }
     }
 }
 </script>
@@ -125,9 +139,11 @@ export default {
 
     .my-comment {
         margin-right: auto;
+        background: rgb(216, 216, 216);
     }
 
     .other-comment {
         margin-left: auto;
+        background: white;
     }
 </style>

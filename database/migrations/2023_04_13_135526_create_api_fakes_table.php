@@ -13,10 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('api_fakes', function (Blueprint $table) {
             $table->id();
-            $table->string('text');
-            $table->date('hidden')->nullable()->default(null);
+            $table->string('content');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('api_fake');
     }
 };
