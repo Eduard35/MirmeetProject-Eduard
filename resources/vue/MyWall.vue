@@ -44,7 +44,8 @@
 
             <div class="options bg-purple w-full flex justify-around mx-5 p-1 rounded-lg text-white text-xl">
                 <like-BTN v-bind:id_user="post.id_user" v-bind:id_post="post.post" />
-                <button><i class="fa fa-retweet"></i></button>
+                <retweet-BTN v-bind:id_user="post.id_user" v-bind:id_post="post.post" />
+                <!-- <button><i class="fa fa-retweet"></i></button> -->
                 <button><i class="fa-regular fa-comment"></i></button>
                 <button><i class="fa fa-share"></i></button>
             </div>

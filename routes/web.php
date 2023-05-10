@@ -88,6 +88,8 @@ Route::get('/my', function() {
 Route::get('/make-like/{id}/{post}', [UserController::class, 'likes'])->middleware(['auth'])->name('make-like');
 Route::get('/check-like/{post}', [UserController::class, 'checkLikes'])->middleware(['auth'])->name('check-like');
 
+Route::get('make-retweet/{id}/{post}', [UserController::class, 'retweet'])->middleware(['auth'])->name('make-retweet');
+
 Route::get('/users', [UserController::class, 'index'])->middleware(['auth', 'verified', 'check_access'])->name('users.index');
 Route::get('/users/create', [UserController::class, 'create'])->middleware(['auth', 'verified', 'check_access'])->name('users.create');
 Route::post('/users', [UserController::class, 'store'])->middleware(['auth', 'verified', 'check_access'])->name('users.store');
