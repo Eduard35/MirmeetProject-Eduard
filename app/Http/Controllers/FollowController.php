@@ -26,6 +26,7 @@ class followController extends Controller
         $notification->sentby_id = $follow->follower_id;
         $notification->sento_id = $follow->following_id;
         $notification->follow_id = $follow->id;
+        $notification->publication_id = 1;
 
         $notification->save();
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NewMessage;
 use App\Events\StartChat;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -113,10 +114,18 @@ class ChatController extends Controller
         $receiver = $this->get_reciever($request->token);
 
         // Guardem el missatge a la base de dades
-        Message::create([
+        $message = Message::create([
             'sentby_id' => Auth::id(),
             'sento_id' => $receiver,
             'text' => $request->message
+        ]);
+
+        Notification::create([
+            'sentby_id' => Auth::id(),
+            'sento_id' => $receiver,
+            'message_id' => $message->id,
+            'publication_id' => 1,
+            
         ]);
 
         // Emitim l'event NewMessage

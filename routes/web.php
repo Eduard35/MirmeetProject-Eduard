@@ -11,6 +11,7 @@ use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\LoginSocialiteController;
+use App\Http\Controllers\MessageController2;
 use App\Models\Publication;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -169,10 +170,10 @@ Route::get('/forgot-password', function () {
  *     RUTES XAT
  * ==================
  */
-Route::get('/chat', [ChatController::class, 'chat_recents'])->middleware(['auth', 'verified', 'check_access']);
-Route::get('/chat/{id}', [ChatController::class, 'index'])->middleware(['auth', 'verified', 'check_access']);
-Route::post('/send', [ChatController::class, 'send'])->middleware(['auth', 'verified', 'check_access']);
-Route::get('/start-chat/{to_id}', [ChatController::class, 'start_chat'])->middleware(['auth', 'verified', 'check_access']);
+Route::get('/chat', [ChatController::class, 'chat_recents'])->middleware(['auth', 'verified']);
+Route::get('/chat/{id}', [ChatController::class, 'index'])->middleware(['auth', 'verified']);
+Route::post('/send', [ChatController::class, 'send'])->middleware(['auth', 'verified']);
+Route::get('/start-chat/{to_id}', [ChatController::class, 'start_chat'])->middleware(['auth', 'verified']);
 
 Route::get('/me', function() {
     return ['id' => Auth::id(), 'username' => Auth::user()->username];
@@ -186,10 +187,10 @@ Route::get('/discover', function() {
 Route::get('/channels', [ChatController::class, 'get_channels'])->middleware(['auth', 'verified']);
 Route::get('/rooms/{to_id}', [ChatController::class, 'check_existing_room'])->middleware(['auth', 'verified']);
 
-Route::get('/recent-chats', [ChatController::class, 'get_recent_chats'])->middleware(['auth', 'verified', 'check_access']);
-Route::get('/messages-between/{token}', [ChatController::class, 'get_messages_between'])->middleware(['auth', 'verified', 'check_access']);
-Route::get('/following-users', [ChatController::class, 'get_following_users_to_chat'])->middleware(['auth', 'verified', 'check_access']);
-Route::get('/following-users/{search}', [ChatController::class, 'get_following_users_to_chat'])->middleware(['auth', 'verified', 'check_access']);
+Route::get('/recent-chats', [ChatController::class, 'get_recent_chats'])->middleware(['auth', 'verified']);
+Route::get('/messages-between/{token}', [ChatController::class, 'get_messages_between'])->middleware(['auth', 'verified']);
+Route::get('/following-users', [ChatController::class, 'get_following_users_to_chat'])->middleware(['auth', 'verified']);
+Route::get('/following-users/{search}', [ChatController::class, 'get_following_users_to_chat'])->middleware(['auth', 'verified']);
 // Aquestes rutes són per accedir als dos murs
 
 
@@ -228,10 +229,17 @@ Route::get('/home', function() {
 // Aquestes rutes retornen els posts a mostrar al mur discover i a la home
 Route::get('/posts-my', [PublicationController::class, 'myWall'])->name('postsMyWall');
 Route::get('/posts-home', [PublicationController::class, 'postsHome'])->name('recoverPostsHome');
+Route::post('/home/{publication}/comments', [PublicationController::class, 'storeComment'])->middleware(['auth', 'verified'])->name('recoverPostsHome');
+
+
 Route::get('/posts-discover', [PublicationController::class, 'postsDiscover'])->name('recoverPostsDiscover');
-//Apartat comentaris
-Route::post('/messages/{id}/comments', 'MessageController@storeComment')->name('messages.comments.store');
-Route::delete('/messages/{id}/comments/{comment_id}', 'MessageController@destroyComment')->name('messages.comments.destroy');
-Route::get('/messages/{id}/comments', 'MessageController@getComments')->name('messages.comments.get');
+Route::post('/discover/{publication}/comments', [PublicationController::class, 'storeComment'])->middleware(['auth', 'verified'])->name('recoverPostsDiscover');
+Route::get('/discover/{publication}/comments', [PublicationController::class, 'showComments'])
+    ->middleware(['auth', 'verified'])
+    ->name('recoverPostsDiscover');
+// Apartat comentaris
+// Route::post('/messages/{id}/comments', 'MessageController@storeComment')->name('messages.comments.store');
+// Route::delete('/messages/{id}/comments/{comment_id}', 'MessageController@destroyComment')->name('messages.comments.destroy');
+// Route::get('/messages/{id}/comments', 'MessageController@getComments')->name('messages.comments.get');
 
 require __DIR__.'/auth.php';
